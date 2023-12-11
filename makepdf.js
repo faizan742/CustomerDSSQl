@@ -8,7 +8,7 @@ function generateInvoice(invoiceData) {
     const doc = new PDFDocument();
   
     doc.pipe(fs.createWriteStream('output.pdf'));
-  
+    doc.image('logo.png', 50, 45, { width: 50 }) 
     doc.font('Helvetica-Bold').fontSize(20).text('Invoice', { align: 'center' });
   
     // Invoice details
@@ -18,10 +18,11 @@ function generateInvoice(invoiceData) {
     doc.font('Helvetica').fontSize(12).text(`Status: ${invoiceData.status}`);
     doc.font('Helvetica').fontSize(12).text(`Customer: ${invoiceData.customer.customerName}`);
     doc.font('Helvetica').fontSize(12).text(`Employee Name: ${invoiceData.customer.employee.firstName} ${invoiceData.customer.employee.lastName}`);
+    doc.font('Helvetica').fontSize(12).text(`office City: ${invoiceData.customer.employee.office.city}`);
     // Invoice items
     var finaltoatl=0.0;
     doc.moveDown();
-    doc.font('Helvetica-Bold').fontSize(14).text('Items', { underline: true });
+    doc.font('Helvetica-Bold').fontSize(14).text('Items Details', { underline: true });
     invoiceData.orderdetails.forEach((item, index) => {
        
       doc.font('Helvetica').fontSize(12).text(`${item.product.productCode}. ${item.product.productName}: $${item.product.MSRP}`);

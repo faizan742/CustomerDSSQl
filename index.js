@@ -1,16 +1,15 @@
 const express = require('express');
 const products=require('./Routes/products');
 var sequelize=require("./database");
-
- const cron = require('node-cron');
-// const fetch = require('node-fetch');
+const PDF=require('./MergeFiles/merge');
+const cron = require('node-cron');
 require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || '8000';
 
 app.use("/products",products);
-
+app.use("/PDF",PDF);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

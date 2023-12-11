@@ -25,45 +25,54 @@ Router.use(express.urlencoded({ extended: true }));
 
 Router
 .route('/fillterData')
-.post((req,res)=>{
-  products.findAll({where:{ 
-    MSRP: {
-    [Op.between]: [req.body.value, req.body.value1],
-  },
-}})
-      .then((result) => {
-        const uuid = uuidv4();
-        quene1.saveData(uuid,result);
-        res.json(uuid);
-      })
-      .catch(error => {
-        console.error('Error querying database:', error);
-        res.sendStatus(404);
-      });
+.get((req,res)=>{
+  try {
+    products.findAll({where:{ 
+      MSRP: {
+      [Op.between]: [req.body.value, req.body.value1],
+    },
+  }})
+        .then((result) => {
+          const uuid = uuidv4();
+          quene1.saveData(uuid,result);
+          res.json(uuid);
+        })
+      
+  } catch (error) {
+   res.send(401);
+   console.log(error);
+  }
 });
 
 Router
 .route('/downloadCSV')
 .get((req, res) => {
-downloadquene.DownloadData(req.body.uuid); 
-res.send(200);
+downloadquene.DownloadData(req.query.uuid); 
+res.json({
+ 'FILE DOWNLOADED':'FILE HAS BEEN DOWNLOADED' 
+});
 });
 
 Router
 .route('/MAKEINVOICE')
-.post((req,res)=>{
+.get((req,res)=>{
   orders.findAll({
+    attributes:['orderNumber','status','shippedDate'],
     include:[{
-      model: orderdetails,      
+      model: orderdetails,
+
       include:[{
         model:products,
+        attributes:['productCode','productName','MSRP']
       }],
     },{
       model:customers,
+      attributes:['customerName'],
       include:[
         {
           
           model:employees,
+          attributes:['firstName','lastName'],
           include:[
             {
               model:offices
@@ -76,7 +85,7 @@ Router
     }
   ],
     where:{
-     orderNumber:parseInt(req.body.orderNumber) 
+     orderNumber:parseInt(req.query.orderNumber) 
     }
   }).then((result) => {
     res.json(result);
